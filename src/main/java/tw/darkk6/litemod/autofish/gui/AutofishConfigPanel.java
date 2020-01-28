@@ -104,11 +104,11 @@ public class AutofishConfigPanel extends Gui implements ConfigPanel {
 	public void drawPanel(ConfigPanelHost host, int mouseX, int mouseY, float partialTicks) {
 		//繪製出所有 Checkbox
 		for(String key:boxMap.keySet())
-			boxMap.get(key).drawButton(mc, mouseX, mouseY);
+			boxMap.get(key).drawButton(mc, mouseX, mouseY, 0.0f);
 		//繪製出所有 String
-		this.drawString(mc.fontRendererObj, Lang.get("autofishd.setting.maxdistance"), rectDis.x, rectDis.y, 0xFFFFFFFF);
-		this.drawString(mc.fontRendererObj, Lang.get("autofishd.setting.breakvalue"), rectBvalue.x, rectBvalue.y, 0xFFFFFFFF);
-		this.drawString(mc.fontRendererObj, Lang.get("autofishd.setting.soundname"), rectSname.x, rectSname.y, 0xFFFF7373);
+		this.drawString(mc.fontRenderer, Lang.get("autofishd.setting.maxdistance"), rectDis.x, rectDis.y, 0xFFFFFFFF);
+		this.drawString(mc.fontRenderer, Lang.get("autofishd.setting.breakvalue"), rectBvalue.x, rectBvalue.y, 0xFFFFFFFF);
+		this.drawString(mc.fontRenderer, Lang.get("autofishd.setting.soundname"), rectSname.x, rectSname.y, 0xFFFF7373);
 		//繪製出所有 Textfield
 		txtDis.drawTextBox();
 		txtSname.drawTextBox();
@@ -166,13 +166,13 @@ public class AutofishConfigPanel extends Gui implements ConfigPanel {
 	}
 
 	private GuiCheckbox createCheckbox(int id,int col,int row,String str){
-		int fh=mc.fontRendererObj.FONT_HEIGHT;
+		int fh=mc.fontRenderer.FONT_HEIGHT;
 		return new GuiCheckbox(id, 10 + col, 10 + (fh+5)*row, str);
 	}
 	
 	private Rect createRect(int col,int row,String str,int hostCenter){
-		int fh=mc.fontRendererObj.FONT_HEIGHT;
-		int strWidth=mc.fontRendererObj.getStringWidth(str);
+		int fh=mc.fontRenderer.FONT_HEIGHT;
+		int strWidth=mc.fontRenderer.getStringWidth(str);
 		return new Rect(
 					10 + col * hostCenter,
 					extraGap + 10 + (fh+7)*row,
@@ -182,8 +182,8 @@ public class AutofishConfigPanel extends Gui implements ConfigPanel {
 	}
 	
 	private GuiTextField createTextbox(int id,Rect rect,int width){
-		int fh=mc.fontRendererObj.FONT_HEIGHT;
-		return new GuiTextField(id,mc.fontRendererObj,
+		int fh=mc.fontRenderer.FONT_HEIGHT;
+		return new GuiTextField(id,mc.fontRenderer,
 						rect.x + rect.width+2,
 						rect.y,
 						width,

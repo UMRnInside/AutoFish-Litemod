@@ -24,7 +24,7 @@ public static Logger log=null;
 		try{
 			TextComponentString txt=new TextComponentString(TextFormatting.RED+"["+Reference.LOG_TAG+"] ");
 			txt.appendText(TextFormatting.RESET+msg);
-			Minecraft.getMinecraft().thePlayer.addChatMessage(txt);
+			Minecraft.getMinecraft().player.sendMessage(txt);
 		}catch(Exception e){
 			Log.info(msg);
 		}
@@ -34,7 +34,7 @@ public static Logger log=null;
 		try{
 			TextComponentString txt=new TextComponentString(TextFormatting.GOLD+"["+Reference.LOG_TAG+"] ");
 			txt.appendText(TextFormatting.RESET+msg);
-			Minecraft.getMinecraft().thePlayer.addChatMessage(txt);
+			Minecraft.getMinecraft().player.sendMessage(txt);
 		}catch(Exception e){
 			Log.info(msg);
 		}

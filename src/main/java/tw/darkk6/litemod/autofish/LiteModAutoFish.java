@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.ISoundEventListener;
 import net.minecraft.client.audio.SoundEventAccessor;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.entity.projectile.EntityFishHook;
@@ -32,10 +33,14 @@ import com.mumfrey.liteloader.permissions.PermissionsManagerClient;
 public class LiteModAutoFish implements InitCompleteListener, Tickable, Permissible, ISoundEventListener,ChatListener,Configurable {
 
 	//送出兩次右鍵事件的間隔時間( in ticks)
-	private static final int TICK_LEN_BETWEEN_RIGHT_CLICK=25;
+	private static final int TICK_LEN_BETWEEN_RIGHT_CLICK=60;
 	private boolean isFishing=false;//我是否正在釣魚
 	private long pullBackms=-1;//上次送出"收回釣竿"右鍵事件的時間
 	private boolean iGotFish=false;//根據聲音撥放事件檢查是否抓到魚
+
+    private int beforeSneaking=-1; // required by some servers
+    private int sneakingTicksLeft=-1;
+
 	//對話訊息回報
 	private long startFishingMs=-1L;
 	//其他
@@ -56,7 +61,7 @@ public class LiteModAutoFish implements InitCompleteListener, Tickable, Permissi
 	public void onChat(ITextComponent chat, String msg){
 		if( !config.isPermitted || startFishingMs==-1) return;//沒有在自動釣魚
 		if(msg.contains(Reference.TIME_REPORT_STR)){
-			Minecraft.getMinecraft().thePlayer.sendChatMessage(Lang.get("autofishd.msg.iamautofishing"));
+			Minecraft.getMinecraft().player.sendChatMessage(Lang.get("autofishd.msg.iamautofishing"));
 		}
 	}
 	
@@ -64,9 +69,39 @@ public class LiteModAutoFish implements InitCompleteListener, Tickable, Permissi
 	public void onTick(Minecraft minecraft, float partialTicks, boolean inGame, boolean clock) {
 		if(!config.isPermitted) return;
 		//是否抓到魚由 soundPlay 負責
-		if (inGame && minecraft.thePlayer != null) {
-			EntityPlayer player = minecraft.thePlayer;
+		if (inGame && minecraft.player != null) {
+			EntityPlayer player = minecraft.player;
 			if (config.enable) {
+                // Sneak when necessary
+                // beforeSneaking == 0 means we are sneaking
+                if (beforeSneaking > -1 || sneakingTicksLeft > -1)
+                {
+                    Log.infoChat("Enter beforeSneaking > -1, "+beforeSneaking);
+                    int keyCode = Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode();
+                    beforeSneaking--;
+
+                    if (sneakingTicksLeft > 0)
+                    {
+                        Log.infoChat("waiting sneak, "+sneakingTicksLeft);
+                        sneakingTicksLeft--;
+                    }
+                    if (sneakingTicksLeft == 0)
+                    {
+                        KeyBinding.setKeyBindState(keyCode, false);
+                        //Minecraft.getMinecraft().player.sendQueue.addToSendQueue(new C0BPacketEntityAction(Minecraft.getMinecraft().player, 1));
+                        beforeSneaking = -1;
+                        sneakingTicksLeft = -1;
+                    }
+                    else if (beforeSneaking == 0)
+                    {
+                        Log.infoChat("Enter beforeSneaking == 0");
+                        sneakingTicksLeft = 10;
+                        KeyBinding.onTick(keyCode);
+                        KeyBinding.setKeyBindState(keyCode, true);
+                    }
+                    // else do nothing
+                }
+
 				if (config.switchRod && isFishing && hasSentRightClick() && !canSendRightClick(player)) {
 					switchFishingRod(player);
 				}
@@ -78,18 +113,21 @@ public class LiteModAutoFish implements InitCompleteListener, Tickable, Permissi
 							startFishingMs=System.currentTimeMillis();
 						
 						if (iGotFish) {
-							minecraft.playerController.processRightClick(player, minecraft.theWorld, player.getHeldItemMainhand(),EnumHand.MAIN_HAND);
-							pullBackms = minecraft.theWorld.getTotalWorldTime();
+                            Log.infoChat("Got fish!");
+							minecraft.playerController.processRightClick(player, minecraft.world, EnumHand.MAIN_HAND);
+							pullBackms = minecraft.world.getTotalWorldTime();
 							iGotFish=false;
+                            beforeSneaking = 10;
+                            sneakingTicksLeft = -1;
 						}
 					//==== 這邊底下都是 fishEntity = null ====
-					} else if (hasSentRightClick() && minecraft.theWorld.getTotalWorldTime() > pullBackms + TICK_LEN_BETWEEN_RIGHT_CLICK) {
+					} else if (hasSentRightClick() && minecraft.world.getTotalWorldTime() > pullBackms + TICK_LEN_BETWEEN_RIGHT_CLICK) {
 						//沒有揮桿出去，但之前 autofish 有送出過拉桿訊息，且和上次送出訊息時間差距 QUEUE_TICK_LENGTH 個 tick 以上
 						//再把竿子丟出去
-						minecraft.playerController.processRightClick(player, minecraft.theWorld, player.getHeldItemMainhand(),EnumHand.MAIN_HAND);
+						minecraft.playerController.processRightClick(player, minecraft.world, EnumHand.MAIN_HAND);
 						pullBackms = -1;
 						iGotFish=false;
-					} else if(!hasSentRightClick() && minecraft.theWorld.getTotalWorldTime() > pullBackms + TICK_LEN_BETWEEN_RIGHT_CLICK){
+					} else if(!hasSentRightClick() && minecraft.world.getTotalWorldTime() > pullBackms + TICK_LEN_BETWEEN_RIGHT_CLICK){
 						//如果已經超過間隔時間，而且之前沒有透過 mod 送出 right Click , 應該是使用者自行取消了
 						startFishingMs=-1;
 					}
@@ -100,6 +138,9 @@ public class LiteModAutoFish implements InitCompleteListener, Tickable, Permissi
 					pullBackms = -1;
 					iGotFish=false;
 					startFishingMs=-1;
+                    beforeSneaking = -1;
+                    sneakingTicksLeft = -1;
+                    Log.infoChat("Reset status.");
 				}
 			}
 		}
@@ -109,12 +150,12 @@ public class LiteModAutoFish implements InitCompleteListener, Tickable, Permissi
 	@Override
 	public void soundPlay(ISound soundIn, SoundEventAccessor accessor) {
 		if(!config.isPermitted || soundIn==null || soundIn.getSoundLocation()==null) return;
-		String soundName=soundIn.getSoundLocation().getResourcePath();
+		String soundName=soundIn.getSoundLocation().getPath();
 		if(!config.soundName.equals(soundName)) return;
 		//確認一下是自己抓到的，理論上沒問題
 		Minecraft mc = Minecraft.getMinecraft();
-		if (mc.isGamePaused() || mc.thePlayer == null) return;
-		EntityPlayer player = mc.thePlayer;
+		if (mc.isGamePaused() || mc.player == null) return;
+		EntityPlayer player = mc.player;
 		EntityFishHook fishEntity=player.fishEntity;
 		if(fishEntity==null) return;
 		double dist=0.0D;
@@ -143,7 +184,8 @@ public class LiteModAutoFish implements InitCompleteListener, Tickable, Permissi
 		InventoryPlayer inventory = player.inventory;
 		//只搜尋 hotbar , 因為 currentItem 只能指定 0~8
 		for (int i = 0; i < 9; i++) {
-			ItemStack item = inventory.mainInventory[i];
+            // this mainInventory is NonNullList<ItemStack>
+			ItemStack item = inventory.mainInventory.get(i);
 			if (item != null && item.getItem() == Items.FISHING_ROD && canUseThisRod(item)){
 				//這個道具是釣竿，且可以使用 
 				inventory.currentItem = i;
