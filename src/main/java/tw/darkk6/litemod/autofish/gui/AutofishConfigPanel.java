@@ -54,14 +54,17 @@ public class AutofishConfigPanel extends Gui implements ConfigPanel {
 			
 			tmp=createCheckbox(ctlID++,0,4,Lang.get("autofishd.setting.showdistance"));
 			boxMap.put("showDistance", tmp);
-			
+
+			tmp = createCheckbox(ctlID++, 0, 5, "Double Reel (used in some servers)");
+			boxMap.put("doubleReel", tmp);
+
 			ctlID=100;
 			extraGap=10;
 			int maxLabelWidth=0;
 			
-			rectDis=createRect(0,5,Lang.get("autofishd.setting.maxdistance"),wCenter);
-			rectBvalue=createRect(0,6,Lang.get("autofishd.setting.breakvalue"),wCenter);
-			rectSname=createRect(0,7,Lang.get("autofishd.setting.soundname"),wCenter);
+			rectDis=createRect(0,6,Lang.get("autofishd.setting.maxdistance"),wCenter);
+			rectBvalue=createRect(0,7,Lang.get("autofishd.setting.breakvalue"),wCenter);
+			rectSname=createRect(0,8,Lang.get("autofishd.setting.soundname"),wCenter);
 			
 			maxLabelWidth = Math.max(rectDis.width, Math.max(rectSname.width, rectBvalue.width)) + 3;
 			rectDis.width=maxLabelWidth;
@@ -85,6 +88,7 @@ public class AutofishConfigPanel extends Gui implements ConfigPanel {
 		config.switchRod=boxMap.get("switchRod").checked;
 		config.checkDistance=boxMap.get("checkDistance").checked;
 		config.showDistance=boxMap.get("showDistance").checked;
+        config.doubleReel = boxMap.get("doubleReel").checked;
 		//取得 txt 內容，驗證後存回 config
 		config.soundName=txtSname.getText();
 		if(config.soundName.length()==0) config.soundName=Config.DEFAULT_SOUND_NAME;
@@ -159,6 +163,7 @@ public class AutofishConfigPanel extends Gui implements ConfigPanel {
 		boxMap.get("switchRod").checked=config.switchRod;
 		boxMap.get("checkDistance").checked=config.checkDistance;
 		boxMap.get("showDistance").checked=config.showDistance;
+        boxMap.get("doubleReel").checked = config.doubleReel;
 		
 		txtDis.setText(String.valueOf(config.maxDistance));
 		txtSname.setText(config.soundName);

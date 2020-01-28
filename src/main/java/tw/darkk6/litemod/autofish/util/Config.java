@@ -36,6 +36,9 @@ public class Config implements Exposable {
 	//是否啟用 顯示聲音距離[偵測用]
 	@Expose @SerializedName("showDistance")
 	public boolean showDistance=false;
+    // 是否启用二次收竿（用于某些服务器A
+	@Expose @SerializedName("doubleReel")
+	public boolean doubleReel=false;
 	
 	//Internal value
 	@Expose @SerializedName("internal_soundName")
@@ -44,7 +47,7 @@ public class Config implements Exposable {
 	public int breakValue=5;
 	
 	public void init(){
-		LiteLoader.getInstance().registerExposable(this,null);
+		LiteLoader.getInstance().registerExposable(this, null);
 	}
 	public void save(){
 		LiteLoader.getInstance().writeConfig(this);

@@ -76,28 +76,35 @@ public class LiteModAutoFish implements InitCompleteListener, Tickable, Permissi
                 // beforeSneaking == 0 means we are sneaking
                 if (beforeSneaking > -1 || sneakingTicksLeft > -1)
                 {
-                    Log.infoChat("Enter beforeSneaking > -1, "+beforeSneaking);
+                    //Log.infoChat("Enter beforeSneaking > -1, "+beforeSneaking);
                     int keyCode = Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode();
                     beforeSneaking--;
 
                     if (sneakingTicksLeft > 0)
                     {
-                        Log.infoChat("waiting sneak, "+sneakingTicksLeft);
+                        //Log.infoChat("waiting sneak, "+sneakingTicksLeft);
                         sneakingTicksLeft--;
+                        return;
                     }
                     if (sneakingTicksLeft == 0)
                     {
                         KeyBinding.setKeyBindState(keyCode, false);
+						if (config.doubleReel)
+                        {
+                            Log.infoChat("ZA WARUDO!");
+                            minecraft.playerController.processRightClick(player, minecraft.world, EnumHand.MAIN_HAND);
+                        }
                         //Minecraft.getMinecraft().player.sendQueue.addToSendQueue(new C0BPacketEntityAction(Minecraft.getMinecraft().player, 1));
                         beforeSneaking = -1;
                         sneakingTicksLeft = -1;
                     }
                     else if (beforeSneaking == 0)
                     {
-                        Log.infoChat("Enter beforeSneaking == 0");
-                        sneakingTicksLeft = 10;
+                        //Log.infoChat("Enter beforeSneaking == 0");
+                        sneakingTicksLeft = 4;
                         KeyBinding.onTick(keyCode);
                         KeyBinding.setKeyBindState(keyCode, true);
+                        return;
                     }
                     // else do nothing
                 }
@@ -113,17 +120,18 @@ public class LiteModAutoFish implements InitCompleteListener, Tickable, Permissi
 							startFishingMs=System.currentTimeMillis();
 						
 						if (iGotFish) {
-                            Log.infoChat("Got fish!");
+                            Log.infoChat("Reel!");
 							minecraft.playerController.processRightClick(player, minecraft.world, EnumHand.MAIN_HAND);
 							pullBackms = minecraft.world.getTotalWorldTime();
 							iGotFish=false;
-                            beforeSneaking = 10;
+                            beforeSneaking = 6;
                             sneakingTicksLeft = -1;
 						}
 					//==== 這邊底下都是 fishEntity = null ====
 					} else if (hasSentRightClick() && minecraft.world.getTotalWorldTime() > pullBackms + TICK_LEN_BETWEEN_RIGHT_CLICK) {
 						//沒有揮桿出去，但之前 autofish 有送出過拉桿訊息，且和上次送出訊息時間差距 QUEUE_TICK_LENGTH 個 tick 以上
 						//再把竿子丟出去
+                        Log.infoChat("Cast!");
 						minecraft.playerController.processRightClick(player, minecraft.world, EnumHand.MAIN_HAND);
 						pullBackms = -1;
 						iGotFish=false;
@@ -140,7 +148,6 @@ public class LiteModAutoFish implements InitCompleteListener, Tickable, Permissi
 					startFishingMs=-1;
                     beforeSneaking = -1;
                     sneakingTicksLeft = -1;
-                    Log.infoChat("Reset status.");
 				}
 			}
 		}
