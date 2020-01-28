@@ -24,7 +24,7 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle.liteloader'
 apply plugin: 'org.spongepowered.mixin'
 
-version = "1.0"
+version = "1.1"
 group = "tw.darkk6.litemod" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "AutoFishD"
 
@@ -35,8 +35,8 @@ compileJava {
 }
 
 minecraft {
-    version = "1.10.2"
-    mappings = "snapshot_20160518"
+    version = "1.12.2"
+    mappings = "snapshot_20171003"
     if (file('../0-ClientRun').exists()) {
 		runDir = "../0-ClientRun"
 	} else {
@@ -57,7 +57,7 @@ mixin {
 
 litemod {
     json {
-		// build ªº®É­Ô·|§â³o¨Ç¸ê°T¼g¨ì litemod.json ¤¤
+		// build çš„æ™‚å€™æœƒæŠŠé€™äº›è³‡è¨Šå¯«åˆ° litemod.json ä¸­
         name = "autofishd"
 		author = "darkk6"
         mcversion = "1.10.2"

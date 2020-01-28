@@ -1,3 +1,6 @@
+ - v 1.1 - mc 1.12.2
+    Port to Minecraft 1.12.2
+
  - v 1.0 - mc 1.9.4
 
 	Port to Liteloader first release
