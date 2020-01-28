@@ -29,14 +29,14 @@ group = "tw.darkk6.litemod" // http://maven.apache.org/guides/mini/guide-naming-
 archivesBaseName = "AutoFishD"
 
 compileJava {
-    // sourceCompatibility = 1.7
-    // targetCompatibility = 1.7
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
     options.encoding = 'UTF-8'
 }
 
 minecraft {
-    version = "1.12.2"
-    mappings = "snapshot_20171003"
+    version = "1.12"
+    mappings = "stable_39"
     if (file('../0-ClientRun').exists()) {
 		runDir = "../0-ClientRun"
 	} else {
@@ -60,7 +60,7 @@ litemod {
 		// build 的時候會把這些資訊寫到 litemod.json 中
         name = "autofishd"
 		author = "darkk6"
-        mcversion = "1.10.2"
+        mcversion = "1.12.2"
     }
 }
 
