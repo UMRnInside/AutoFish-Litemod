@@ -84,7 +84,6 @@ public class LiteModAutoFish implements InitCompleteListener, Tickable, Permissi
                     {
                         //Log.infoChat("waiting sneak, "+sneakingTicksLeft);
                         sneakingTicksLeft--;
-                        return;
                     }
                     if (sneakingTicksLeft == 0)
                     {
@@ -104,7 +103,6 @@ public class LiteModAutoFish implements InitCompleteListener, Tickable, Permissi
                         sneakingTicksLeft = 4;
                         KeyBinding.onTick(keyCode);
                         KeyBinding.setKeyBindState(keyCode, true);
-                        return;
                     }
                     // else do nothing
                 }
