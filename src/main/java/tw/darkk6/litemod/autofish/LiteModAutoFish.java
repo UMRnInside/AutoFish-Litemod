@@ -40,6 +40,7 @@ public class LiteModAutoFish implements InitCompleteListener, Tickable, Permissi
 
     private int beforeSneaking=-1; // required by some servers
     private int sneakingTicksLeft=-1;
+    private boolean leftClickPressed = false;
 
 	//對話訊息回報
 	private long startFishingMs=-1L;
@@ -77,8 +78,16 @@ public class LiteModAutoFish implements InitCompleteListener, Tickable, Permissi
                 if (beforeSneaking > -1 || sneakingTicksLeft > -1)
                 {
                     //Log.infoChat("Enter beforeSneaking > -1, "+beforeSneaking);
-                    int keyCode = Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode();
+                    int keyCodeSneak = Minecraft.getMinecraft().gameSettings.keyBindSneak.getKeyCode();
+                    // for AntiAFK
+                    int keyCodeLeftClick = Minecraft.getMinecraft().gameSettings.keyBindAttack.getKeyCode();
                     beforeSneaking--;
+
+                    if (leftClickPressed)
+                    {
+                        KeyBinding.setKeyBindState(keyCodeLeftClick, false);
+                        leftClickPressed = false;
+                    }
 
                     if (sneakingTicksLeft > 0)
                     {
@@ -87,7 +96,7 @@ public class LiteModAutoFish implements InitCompleteListener, Tickable, Permissi
                     }
                     if (sneakingTicksLeft == 0)
                     {
-                        KeyBinding.setKeyBindState(keyCode, false);
+                        KeyBinding.setKeyBindState(keyCodeSneak, false);
 						if (config.doubleReel)
                         {
                             Log.infoChat("ZA WARUDO!");
@@ -101,8 +110,14 @@ public class LiteModAutoFish implements InitCompleteListener, Tickable, Permissi
                     {
                         //Log.infoChat("Enter beforeSneaking == 0");
                         sneakingTicksLeft = 4;
-                        KeyBinding.onTick(keyCode);
-                        KeyBinding.setKeyBindState(keyCode, true);
+                        KeyBinding.onTick(keyCodeSneak);
+                        KeyBinding.setKeyBindState(keyCodeSneak, true);
+                        if (config.antiafk)
+                        {
+                            KeyBinding.onTick(keyCodeLeftClick);
+                            KeyBinding.setKeyBindState(keyCodeLeftClick, true);
+                            leftClickPressed = true;
+                        }
                     }
                     // else do nothing
                 }

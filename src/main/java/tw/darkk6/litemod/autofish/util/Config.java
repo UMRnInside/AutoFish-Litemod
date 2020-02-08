@@ -39,6 +39,8 @@ public class Config implements Exposable {
     // 是否启用二次收竿（用于某些服务器A
 	@Expose @SerializedName("doubleReel")
 	public boolean doubleReel=false;
+	@Expose @SerializedName("antiafk")
+	public boolean antiafk=false;
 	
 	//Internal value
 	@Expose @SerializedName("internal_soundName")
