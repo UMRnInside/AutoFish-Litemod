@@ -60,10 +60,18 @@ public class LiteModAutoFish implements InitCompleteListener, Tickable, Permissi
 
 	@Override
 	public void onChat(ITextComponent chat, String msg){
-		if( !config.isPermitted || startFishingMs==-1) return;//沒有在自動釣魚
+		//if( !config.isPermitted || startFishingMs==-1) return;//沒有在自動釣魚
 		if(msg.contains(Reference.TIME_REPORT_STR)){
 			Minecraft.getMinecraft().player.sendChatMessage(Lang.get("autofishd.msg.iamautofishing"));
 		}
+        if (msg.contains("Are you OK?"))
+        {
+            Minecraft.getMinecraft().player.sendChatMessage("We will give everyone a band!");
+        }
+        if (msg.contains("噔 噔 咚"))
+        {
+            Minecraft.getMinecraft().player.sendChatMessage("心 肺 停 止");
+        }
 	}
 	
 	@Override
